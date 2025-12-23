@@ -4,9 +4,12 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.fitness.DataType
 import com.google.android.gms.fitness.FitnessOptions
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,11 +28,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val editDate = findViewById<android.widget.EditText>(R.id.editDate)
-        val editTime = findViewById<android.widget.EditText>(R.id.editTime)
-        val editSteps = findViewById<android.widget.EditText>(R.id.editSteps)
-        val btnSubmit = findViewById<android.widget.Button>(R.id.btnSubmit)
-        val txtStatus = findViewById<android.widget.TextView>(R.id.txtStatus)
+        val editDate = findViewById<EditText>(R.id.editDate)
+        val editTime = findViewById<EditText>(R.id.editTime)
+        val editSteps = findViewById<EditText>(R.id.editSteps)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        val txtStatus = findViewById<TextView>(R.id.txtStatus)
 
         editDate.setOnClickListener {
             val now = LocalDate.now()
@@ -95,6 +98,7 @@ class MainActivity : AppCompatActivity() {
             txtStatus.text = "寫入中..."
             GoogleFitWriter.upsertStepsAtSecond(
                 context = this,
+                googleAccount = account,
                 instant = instant,
                 steps = steps
             ) { success, message ->
@@ -111,6 +115,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // 授權結束後再按一次寫入即可
+        if (requestCode == 1001) {
+            findViewById<TextView>(R.id.txtStatus).text =
+                "授權完成，請再按一次『寫入 GOOGLE FIT』"
+        }
     }
 }
