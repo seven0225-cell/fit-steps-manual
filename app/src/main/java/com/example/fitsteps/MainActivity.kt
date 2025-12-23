@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
         val txtStatus = findViewById<TextView>(R.id.txtStatus)
 
+        // 日期選擇
         editDate.setOnClickListener {
             val now = LocalDate.now()
             DatePickerDialog(
@@ -46,18 +47,20 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
+        // 時間選擇（秒預設 0，可以之後再優化）
         editTime.setOnClickListener {
             val now = LocalTime.now()
             TimePickerDialog(
                 this,
                 { _, h, min ->
                     val time = LocalTime.of(h, min, 0)
-                    editTime.setText(time.toString())
+                    editTime.setText(time.toString()) // HH:mm:ss
                 },
                 now.hour, now.minute, true
             ).show()
         }
 
+        // 按下「寫入 GOOGLE FIT」
         btnSubmit.setOnClickListener {
             val dateText = editDate.text.toString()
             val timeText = editTime.text.toString()
@@ -106,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                     txtStatus.text = if (success) {
                         "成功寫入：$message"
                     } else {
-                        "寫入失敗：$message"
+                        "寫入失敗：${message}"
                     }
                 }
             }
@@ -116,8 +119,8 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1001) {
-            findViewById<TextView>(R.id.txtStatus).text =
-                "授權完成，請再按一次『寫入 GOOGLE FIT』"
+            val txtStatus = findViewById<TextView>(R.id.txtStatus)
+            txtStatus.text = "授權完成，請再按一次『寫入 GOOGLE FIT』"
         }
     }
 }
