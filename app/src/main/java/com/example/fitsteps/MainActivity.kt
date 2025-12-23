@@ -5,8 +5,8 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.fitness.DataType
 import com.google.android.gms.fitness.FitnessOptions
 import java.time.LocalDate
 import java.time.LocalDateTime
