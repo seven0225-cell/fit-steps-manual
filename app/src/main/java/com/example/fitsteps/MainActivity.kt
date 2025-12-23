@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
         val txtStatus = findViewById<TextView>(R.id.txtStatus)
 
-        // 日期選擇
         editDate.setOnClickListener {
             val now = LocalDate.now()
             DatePickerDialog(
@@ -47,20 +46,18 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        // 時間選擇（秒先固定為 0）
         editTime.setOnClickListener {
             val now = LocalTime.now()
             TimePickerDialog(
                 this,
                 { _, h, min ->
                     val time = LocalTime.of(h, min, 0)
-                    editTime.setText(time.toString()) // HH:mm:ss
+                    editTime.setText(time.toString())
                 },
                 now.hour, now.minute, true
             ).show()
         }
 
-        // 按下「寫入 GOOGLE FIT」
         btnSubmit.setOnClickListener {
             val dateText = editDate.text.toString()
             val timeText = editTime.text.toString()
