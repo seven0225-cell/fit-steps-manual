@@ -34,23 +34,26 @@ class MainActivity : AppCompatActivity() {
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
         val txtStatus = findViewById<TextView>(R.id.txtStatus)
 
+        // 日期選擇
         editDate.setOnClickListener {
             val now = LocalDate.now()
             DatePickerDialog(
                 this,
                 { _, y, m, d ->
                     val date = LocalDate.of(y, m + 1, d)
-                    editDate.setText(date.toString())
+                    editDate.setText(date.toString())   // yyyy-MM-dd
                 },
                 now.year, now.monthValue - 1, now.dayOfMonth
             ).show()
         }
 
+        // 時間選擇（自動補秒）
         editTime.setOnClickListener {
             val now = LocalTime.now()
             TimePickerDialog(
                 this,
                 { _, h, min ->
+                    // 秒固定 0，格式 HH:mm:ss
                     val time = LocalTime.of(h, min, 0)
                     editTime.setText(time.toString())
                 },
@@ -58,12 +61,13 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
+        // 按下「寫入 GOOGLE FIT」
         btnSubmit.setOnClickListener {
-            val dateText = editDate.text.toString()
-            val timeText = editTime.text.toString()
-            val stepsText = editSteps.text.toString()
+            val dateText = editDate.text.toString().trim()
+            val timeTextRaw = editTime.text.toString().trim()
+            val stepsText = editSteps.text.toString().trim()
 
-            if (dateText.isBlank() || timeText.isBlank() || stepsText.isBlank()) {
+            if (dateText.isBlank() || timeTextRaw.isBlank() || stepsText.isBlank()) {
                 txtStatus.text = "請輸入完整的日期、時間與步數"
                 return@setOnClickListener
             }
@@ -74,10 +78,17 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // 容忍 HH:mm，缺秒數時自動補 :00
+            val timeText = when (timeTextRaw.length) {
+                5 -> timeTextRaw + ":00"  // HH:mm -> HH:mm:00
+                8 -> timeTextRaw          // HH:mm:ss
+                else -> timeTextRaw
+            }
+
             val ldt = try {
                 LocalDateTime.parse("${dateText}T$timeText")
             } catch (e: Exception) {
-                txtStatus.text = "日期或時間格式錯誤"
+                txtStatus.text = "日期或時間格式錯誤（目前為：$dateText $timeTextRaw）"
                 return@setOnClickListener
             }
 
