@@ -1,14 +1,13 @@
 package com.example.fitsteps
 
 import android.content.Context
-import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.fitness.Fitness
-import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataPoint
 import com.google.android.gms.fitness.data.DataSet
 import com.google.android.gms.fitness.data.DataSource
-import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.data.DataType
+import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataDeleteRequest
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -17,20 +16,17 @@ object GoogleFitWriter {
 
     fun upsertStepsAtSecond(
         context: Context,
+        googleAccount: GoogleSignInAccount,
         instant: Instant,
         steps: Int,
         onResult: (Boolean, String) -> Unit
     ) {
-        val fitnessOptions = FitnessOptions.builder()
-            .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
-            .build()
-
-        val account = GoogleSignIn.getAccountForExtension(context, fitnessOptions)
-        val historyClient = Fitness.getHistoryClient(context, account)
+        val historyClient = Fitness.getHistoryClient(context, googleAccount)
 
         val startSec = instant.epochSecond
-        val endSec = startSec + 1
+        val endSec = startSec + 1        // 1 秒時間桶 [startSec, endSec)
 
+        // 先刪除同一秒內舊的步數資料（只有你這個 App 寫入的會被刪掉）
         val deleteRequest = DataDeleteRequest.Builder()
             .setTimeInterval(startSec, endSec, TimeUnit.SECONDS)
             .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
