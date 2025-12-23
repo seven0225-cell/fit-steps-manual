@@ -64,4 +64,70 @@ class MainActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener {
             val dateText = editDate.text.toString().trim()
             val timeTextRaw = editTime.text.toString().trim()
-            val stepsText = editSteps.text
+            val stepsText = editSteps.text.toString().trim()
+
+            if (dateText.isBlank() || timeTextRaw.isBlank() || stepsText.isBlank()) {
+                txtStatus.text = "請輸入完整的日期、時間與步數"
+                return@setOnClickListener
+            }
+
+            val steps = stepsText.toIntOrNull()
+            if (steps == null || steps < 0) {
+                txtStatus.text = "步數必須是非負整數"
+                return@setOnClickListener
+            }
+
+            // 容忍 HH:mm，缺秒數時自動補 :00
+            val timeText = when (timeTextRaw.length) {
+                5 -> timeTextRaw + ":00"   // HH:mm -> HH:mm:00
+                8 -> timeTextRaw           // HH:mm:ss
+                else -> timeTextRaw
+            }
+
+            val ldt = try {
+                LocalDateTime.parse("${dateText}T$timeText")
+            } catch (e: Exception) {
+                txtStatus.text = "日期或時間格式錯誤（目前為：$dateText $timeTextRaw）"
+                return@setOnClickListener
+            }
+
+            val account = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
+            if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
+                GoogleSignIn.requestPermissions(
+                    this,
+                    1001,
+                    account,
+                    fitnessOptions
+                )
+                return@setOnClickListener
+            }
+
+            val zoneId = ZoneId.systemDefault()
+            val instant = ldt.atZone(zoneId).toInstant()
+
+            txtStatus.text = "寫入中..."
+            GoogleFitWriter.upsertStepsAtSecond(
+                context = this,
+                googleAccount = account,
+                instant = instant,
+                steps = steps
+            ) { success, message ->
+                runOnUiThread {
+                    txtStatus.text = if (success) {
+                        "成功寫入：$message"
+                    } else {
+                        "寫入失敗：$message"
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001) {
+            val txtStatus = findViewById<TextView>(R.id.txtStatus)
+            txtStatus.text = "授權完成，請再按一次『寫入 GOOGLE FIT』"
+        }
+    }
+}
