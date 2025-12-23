@@ -9,7 +9,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.fitness.DataType
+import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.FitnessOptions
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        // 時間選擇（秒預設 0，可以之後再優化）
+        // 時間選擇（秒先固定為 0）
         editTime.setOnClickListener {
             val now = LocalTime.now()
             TimePickerDialog(
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                     txtStatus.text = if (success) {
                         "成功寫入：$message"
                     } else {
-                        "寫入失敗：${message}"
+                        "寫入失敗：$message"
                     }
                 }
             }
