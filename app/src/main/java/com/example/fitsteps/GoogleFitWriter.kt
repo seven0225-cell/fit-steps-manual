@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.data.DataPoint
 import com.google.android.gms.fitness.data.DataSet
 import com.google.android.gms.fitness.data.DataSource
 import com.google.android.gms.fitness.data.Field
-import com.google.android.gms.fitness.DataType
+import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.request.DataDeleteRequest
 import java.time.Instant
 import java.util.concurrent.TimeUnit
