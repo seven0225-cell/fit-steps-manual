@@ -24,9 +24,9 @@ object GoogleFitWriter {
         val historyClient = Fitness.getHistoryClient(context, googleAccount)
 
         val startSec = instant.epochSecond
-        val endSec = startSec + 1        // 1 秒時間桶 [startSec, endSec)
+        val endSec = startSec + 1   // 1 秒時間桶 [startSec, endSec)
 
-        // 先刪除同一秒內舊的步數資料（只有你這個 App 寫入的會被刪掉）
+        // 先刪除同一秒內舊的步數資料（只會刪到你這個 App 寫入的）
         val deleteRequest = DataDeleteRequest.Builder()
             .setTimeInterval(startSec, endSec, TimeUnit.SECONDS)
             .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
